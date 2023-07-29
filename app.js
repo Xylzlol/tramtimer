@@ -25,8 +25,10 @@
 
         // Returns the current time in seconds from midnight
         function currentTimeInSecondsFromMidnight() {
-            const now = new Date();
-            return ((now.getHours() * 60 + now.getMinutes()) * 60) + now.getSeconds();
+            // Helsinki timezone
+            const helsinkiTime = moment.tz('Europe/Helsinki');
+        
+            return helsinkiTime.hour() * 60 * 60 + helsinkiTime.minute() * 60 + helsinkiTime.second();
         }
 
         // Fetch next tram arrivals initially and start the timer
@@ -164,26 +166,41 @@
         }
 
         function processStopTimes(stop, elementId, currentRealtimeArrival) {
-    if (stop && stop.stoptimesWithoutPatterns.length > 0) {
-        stop.stoptimesWithoutPatterns.sort((a, b) => a.realtimeArrival - b.realtimeArrival);
-
-        const currentTime = currentTimeInSecondsFromMidnight();
-
-        // Find the first realtimeArrival that is greater than the current time
-        const nextArrival = stop.stoptimesWithoutPatterns.find(stoptime => stoptime.realtimeArrival > currentTime);
-        if (nextArrival) {
-            if (elementId === 'nextArrival1') {
-                nextRealtimeArrival1 = nextArrival.realtimeArrival;
-                nextScheduledArrival1 = nextArrival.scheduledArrival;
-            } else if (elementId === 'nextArrival2') {
-                nextRealtimeArrival2 = nextArrival.realtimeArrival;
-                nextScheduledArrival2 = nextArrival.scheduledArrival;
+            if (stop && stop.stoptimesWithoutPatterns.length > 0) {
+                stop.stoptimesWithoutPatterns.sort((a, b) => a.realtimeArrival - b.realtimeArrival);
+        
+                const currentTime = currentTimeInSecondsFromMidnight();
+                let nextArrival;
+        
+                // If the nextArrival is more than a day away, subtract 24 hours
+                for (let i = 0; i < stop.stoptimesWithoutPatterns.length; i++) {
+                    let arrival = stop.stoptimesWithoutPatterns[i];
+                    if (arrival.realtimeArrival > currentTime + 24 * 60 * 60) {
+                        arrival.realtimeArrival -= 24 * 60 * 60;
+                    }
+                    if (arrival.scheduledArrival > currentTime + 24 * 60 * 60) {
+                        arrival.scheduledArrival -= 24 * 60 * 60;
+                    }
+                    if (arrival.realtimeArrival > currentTime) {
+                        nextArrival = arrival;
+                        break;
+                    }
+                }
+        
+                if (nextArrival) {
+                    if (elementId === 'nextArrival1') {
+                        nextRealtimeArrival1 = nextArrival.realtimeArrival;
+                        nextScheduledArrival1 = nextArrival.scheduledArrival;
+                    } else if (elementId === 'nextArrival2') {
+                        nextRealtimeArrival2 = nextArrival.realtimeArrival;
+                        nextScheduledArrival2 = nextArrival.scheduledArrival;
+                    }
+                } else {
+                    document.getElementById(elementId).textContent = "No upcoming trams.";
+                }
+            } else {
+                document.getElementById(elementId).textContent = "No tram data available.";
             }
-        } else {
-            document.getElementById(elementId).textContent = "No upcoming trams.";
         }
-    } else {
-        document.getElementById(elementId).textContent = "No tram data available.";
-    }
-}
+        
 
