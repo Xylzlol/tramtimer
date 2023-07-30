@@ -1,6 +1,6 @@
 // Constants
-const base64StopId1 = 'U3RvcDpIU0w6MTMwMTQ1NA==';
-const base64StopId2 = 'U3RvcDpIU0w6MTMwMTQ1NQ==';
+const base64StopId1 = 'U3RvcDpIU0w6MTMwMTQ1NQ=='; // U3RvcDpIU0w6MTMwMTQ1NA== the wrong one
+const base64StopId2 = 'U3RvcDpIU0w6MTMwMTQ1NQ=='; // U3RvcDpIU0w6MTMwMTQ1NQ== the good one
 const apiKey = '8e34621efbb24fa6ac76eac6994fcfe0';
 const apiCallSeconds = [39, 35, 25, 15, 10, 8, 0];
 
